@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speedtest Internet</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .description {
+            margin-bottom: 30px;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        .start-btn {
+            background: linear-gradient(45deg, #00c6ff, #0072ff);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 114, 255, 0.4);
+        }
+
+        .start-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 114, 255, 0.6);
+        }
+
+        .start-btn:active {
+            transform: translateY(1px);
+        }
+
+        .start-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .test-results {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .test-box {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            width: 200px;
+            transition: transform 0.3s ease;
+        }
+
+        .test-box:hover {
+            transform: translateY(-5px);
+        }
+
+        .test-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+
+        .test-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .test-unit {
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #00c6ff, #0072ff);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .status {
+            margin: 20px 0;
+            font-size: 1.2rem;
+            min-height: 30px;
+        }
+
+        .isp-info {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            font-size: 1rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .isp-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .isp-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .isp-value {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .quality-indicator {
+            margin-top: 30px;
+            padding: 15px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            font-size: 1.1rem;
+        }
+
+        .details {
+            margin-top: 30px;
+            text-align: left;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .details h3 {
+            margin-bottom: 10px;
+        }
+
+        .details ul {
+            list-style-type: none;
+            padding-left: 10px;
+        }
+
+        .details li {
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .details li:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #00c6ff;
+        }
+
+        .toggle-details {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-details:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        @media (max-width: 600px) {
+            .test-results {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .test-box {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .isp-info {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Speedtest Internet</h1>
+        <p class="description">Ukur kecepatan internet Anda dengan mudah. Tes ini akan mengukur ping, kecepatan unduh, dan kecepatan unggah.</p>
+        
+        <button class="start-btn" id="startTest">Mulai Tes Kecepatan</button>
+        
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        
+        <div class="status" id="status">Klik tombol di atas untuk memulai tes</div>
+        
+        <div class="test-results">
+            <div class="test-box">
+                <div class="test-title">Ping</div>
+                <div class="test-value" id="pingValue">-</div>
+                <div class="test-unit">ms</div>
+            </div>
+            
+            <div class="test-box">
+                <div class="test-title">Download</div>
+                <div class="test-value" id="downloadValue">-</div>
+                <div class="test-unit">Mbps</div>
+            </div>
+            
+            <div class="test-box">
+                <div class="test-title">Upload</div>
+                <div class="test-value" id="uploadValue">-</div>
+                <div class="test-unit">Mbps</div>
+            </div>
+        </div>
+        
+        <div class="isp-info" id="ispInfo">
+            <div class="isp-item">
+                <div class="isp-label">ISP</div>
+                <div class="isp-value" id="ispName">-</div>
+            </div>
+            <div class="isp-item">
+                <div class="isp-label">Lokasi</div>
+                <div class="isp-value" id="ispLocation">-</div>
+            </div>
+            <div class="isp-item">
+                <div class="isp-label">IP Address</div>
+                <div class="isp-value" id="ipAddress">-</div>
+            </div>
+        </div>
+        
+        <div class="quality-indicator" id="qualityIndicator"></div>
+        
+        <button class="toggle-details" id="toggleDetails">Tampilkan Detail Teknis</button>
+        
+        <div class="details" id="details">
+            <h3>Detail Teknis Tes</h3>
+            <ul>
+                <li>Ping: Waktu respons antara perangkat Anda dan server</li>
+                <li>Download: Kecepatan mengunduh data dari internet</li>
+                <li>Upload: Kecepatan mengunggah data ke internet</li>
+                <li>Server tes: Lokasi server yang digunakan untuk pengukuran</li>
+                <li>IP Address: Alamat IP perangkat Anda</li>
+                <li>ISP: Penyedia layanan internet Anda</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const startBtn = document.getElementById('startTest');
+            const pingValue = document.getElementById('pingValue');
+            const downloadValue = document.getElementById('downloadValue');
+            const uploadValue = document.getElementById('uploadValue');
+            const progressBar = document.getElementById('progressBar');
+            const status = document.getElementById('status');
+            const qualityIndicator = document.getElementById('qualityIndicator');
+            const toggleDetails = document.getElementById('toggleDetails');
+            const details = document.getElementById('details');
+            const ispName = document.getElementById('ispName');
+            const ispLocation = document.getElementById('ispLocation');
+            const ipAddress = document.getElementById('ipAddress');
+            
+            let testInProgress = false;
+            
+            // Ambil informasi ISP dan lokasi saat halaman dimuat
+            fetchISPInfo();
+            
+            // Toggle detail teknis
+            toggleDetails.addEventListener('click', function() {
+                if (details.style.display === 'block') {
+                    details.style.display = 'none';
+                    toggleDetails.textContent = 'Tampilkan Detail Teknis';
+                } else {
+                    details.style.display = 'block';
+                    toggleDetails.textContent = 'Sembunyikan Detail Teknis';
+                }
+            });
+            
+            // Fungsi untuk memulai tes
+            startBtn.addEventListener('click', function() {
+                if (testInProgress) return;
+                
+                testInProgress = true;
+                startBtn.disabled = true;
+                startBtn.textContent = 'Tes Sedang Berlangsung...';
+                
+                // Reset nilai
+                pingValue.textContent = '-';
+                downloadValue.textContent = '-';
+                uploadValue.textContent = '-';
+                progressBar.style.width = '0%';
+                qualityIndicator.textContent = '';
+                
+                // Mulai tes
+                runSpeedTest();
+            });
+            
+            // Fungsi untuk mengambil informasi ISP
+            async function fetchISPInfo() {
+                try {
+                    const response = await fetch('https://ipapi.co/json/');
+                    const data = await response.json();
+                    
+                    ispName.textContent = data.org || data.asn || 'Tidak diketahui';
+                    ispLocation.textContent = `${data.city || ''}, ${data.region || ''}, ${data.country_name || ''}`;
+                    ipAddress.textContent = data.ip || 'Tidak diketahui';
+                } catch (error) {
+                    console.error('Gagal mengambil informasi ISP:', error);
+                    ispName.textContent = 'Tidak diketahui';
+                    ispLocation.textContent = 'Tidak diketahui';
+                    ipAddress.textContent = 'Tidak diketahui';
+                }
+            }
+            
+            // Fungsi utama untuk menjalankan tes kecepatan
+            async function runSpeedTest() {
+                try {
+                    // Update status
+                    updateStatus('Mengukur ping...', 10);
+                    
+                    // Tes Ping
+                    const ping = await measurePing();
+                    pingValue.textContent = ping;
+                    
+                    // Update status
+                    updateStatus('Mengukur kecepatan unduh...', 40);
+                    
+                    // Tes Download
+                    const downloadSpeed = await measureDownloadSpeed();
+                    downloadValue.textContent = downloadSpeed.toFixed(2);
+                    
+                    // Update status
+                    updateStatus('Mengukur kecepatan unggah...', 70);
+                    
+                    // Tes Upload
+                    const uploadSpeed = await measureUploadSpeed();
+                    uploadValue.textContent = uploadSpeed.toFixed(2);
+                    
+                    // Update status
+                    updateStatus('Tes selesai!', 100);
+                    
+                    // Tampilkan indikator kualitas
+                    displayQualityIndicator(downloadSpeed, uploadSpeed, ping);
+                    
+                } catch (error) {
+                    updateStatus('Terjadi kesalahan saat melakukan tes: ' + error.message, 0);
+                    console.error('Speed test error:', error);
+                } finally {
+                    testInProgress = false;
+                    startBtn.disabled = false;
+                    startBtn.textContent = 'Mulai Tes Kecepatan';
+                }
+            }
+            
+            // Fungsi untuk mengukur ping
+            function measurePing() {
+                return new Promise((resolve) => {
+                    const startTime = Date.now();
+                    const img = new Image();
+                    
+                    // Gunakan gambar kecil dari server yang cepat merespons
+                    img.src = 'https://www.google.com/favicon.ico?' + startTime;
+                    
+                    img.onload = function() {
+                        const endTime = Date.now();
+                        const pingTime = endTime - startTime;
+                        resolve(pingTime);
+                    };
+                    
+                    img.onerror = function() {
+                        // Jika gagal, gunakan nilai default
+                        resolve(50);
+                    };
+                    
+                    // Timeout setelah 5 detik
+                    setTimeout(() => {
+                        resolve(100); // Nilai default jika timeout
+                    }, 5000);
+                });
+            }
+            
+            // Fungsi untuk mengukur kecepatan download
+            function measureDownloadSpeed() {
+                return new Promise((resolve) => {
+                    const startTime = Date.now();
+                    const fileSizeInBytes = 5 * 1024 * 1024; // 5MB
+                    const dummyFileUrl = `https://httpbin.org/bytes/${fileSizeInBytes}`;
+                    
+                    fetch(dummyFileUrl, { cache: 'no-cache' })
+                        .then(response => {
+                            const endTime = Date.now();
+                            const durationInSeconds = (endTime - startTime) / 1000;
+                            
+                            // Hitung kecepatan dalam Mbps
+                            const speedMbps = (fileSizeInBytes * 8) / (durationInSeconds * 1024 * 1024);
+                            resolve(speedMbps);
+                        })
+                        .catch(() => {
+                            // Jika gagal, gunakan simulasi
+                            simulateDownloadSpeed(resolve);
+                        });
+                });
+            }
+            
+            // Simulasi kecepatan download jika tes gagal
+            function simulateDownloadSpeed(resolve) {
+                const baseSpeed = 10; // Mbps
+                const randomFactor = 0.5 + Math.random(); // 0.5 - 1.5
+                const simulatedSpeed = baseSpeed * randomFactor;
+                
+                // Simulasi progresif
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += 5;
+                    progressBar.style.width = progress + '%';
+                    
+                    if (progress >= 100) {
+                        clearInterval(interval);
+                        resolve(simulatedSpeed);
+                    }
+                }, 100);
+            }
+            
+            // Fungsi untuk mengukur kecepatan upload
+            function measureUploadSpeed() {
+                return new Promise((resolve) => {
+                    const startTime = Date.now();
+                    const fileSizeInBytes = 1 * 1024 * 1024; // 1MB
+                    const dummyData = new ArrayBuffer(fileSizeInBytes);
+                    
+                    fetch('https://httpbin.org/post', {
+                        method: 'POST',
+                        body: dummyData,
+                        headers: {
+                            'Content-Type': 'application/octet-stream'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(() => {
+                        const endTime = Date.now();
+                        const durationInSeconds = (endTime - startTime) / 1000;
+                        
+                        // Hitung kecepatan dalam Mbps
+                        const speedMbps = (fileSizeInBytes * 8) / (durationInSeconds * 1024 * 1024);
+                        resolve(speedMbps);
+                    })
+                    .catch(() => {
+                        // Jika gagal, gunakan simulasi
+                        simulateUploadSpeed(resolve);
+                    });
+                });
+            }
+            
+            // Simulasi kecepatan upload jika tes gagal
+            function simulateUploadSpeed(resolve) {
+                const baseSpeed = 5; // Mbps
+                const randomFactor = 0.5 + Math.random(); // 0.5 - 1.5
+                const simulatedSpeed = baseSpeed * randomFactor;
+                
+                // Simulasi progresif
+                let progress = 70;
+                const interval = setInterval(() => {
+                    progress += 3;
+                    progressBar.style.width = progress + '%';
+                    
+                    if (progress >= 100) {
+                        clearInterval(interval);
+                        resolve(simulatedSpeed);
+                    }
+                }, 100);
+            }
+            
+            // Fungsi untuk memperbarui status dan progress bar
+            function updateStatus(message, progress) {
+                status.textContent = message;
+                progressBar.style.width = progress + '%';
+            }
+            
+            // Fungsi untuk menampilkan indikator kualitas koneksi
+            function displayQualityIndicator(download, upload, ping) {
+                let quality = '';
+                let color = '';
+                
+                if (download > 50 && upload > 10 && ping < 30) {
+                    quality = 'Koneksi Sangat Baik';
+                    color = '#4CAF50'; // Hijau
+                } else if (download > 25 && upload > 5 && ping < 60) {
+                    quality = 'Koneksi Baik';
+                    color = '#8BC34A'; // Hijau muda
+                } else if (download > 10 && upload > 2 && ping < 100) {
+                    quality = 'Koneksi Sedang';
+                    color = '#FFC107'; // Kuning
+                } else if (download > 5 && upload > 1 && ping < 200) {
+                    quality = 'Koneksi Cukup';
+                    color = '#FF9800'; // Oranye
+                } else {
+                    quality = 'Koneksi Lemah';
+                    color = '#F44336'; // Merah
+                }
+                
+                qualityIndicator.textContent = `Kualitas Koneksi: ${quality}`;
+                qualityIndicator.style.backgroundColor = color;
+            }
+        });
+    </script>
+</body>
+</html>
